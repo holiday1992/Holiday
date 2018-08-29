@@ -56,7 +56,7 @@ namespace PSTMaster
                     if (Directory.Exists(configpath))
                     {
                         Console.WriteLine("The config directory:{0} exists already.", configpath);
-                        WriteLog(configpath, logfile, string.Format("The config directory:{0} exists already.", configpath));
+                        WriteLog(configpath, logfile, string.Format("The config directory:{0} exists already.",configpath));
 
                     }
 
@@ -64,7 +64,7 @@ namespace PSTMaster
                     {
                         DirectoryInfo di = Directory.CreateDirectory(configpath);
                         Console.WriteLine("The config directory was created successfully at {0}.", Directory.GetCreationTime(configpath));
-                        WriteLog(configpath, logfile, string.Format("The config directory was created successfully at {0}.", Directory.GetCreationTime(configpath)));
+                        WriteLog(configpath, logfile, string.Format("The config directory:{0} successfully created",configpath));
                     }
 
 
@@ -75,13 +75,13 @@ namespace PSTMaster
                     if (Directory.Exists(collectpath))
                     {
                         Console.WriteLine("Checked the collect path {0} is acessable.", collectpath);
-                        WriteLog(configpath, logfile, string.Format("The collect path {0} is acessable.", configpath));
+                        WriteLog(configpath, logfile, string.Format("The collect path:{0} is aceessable",collectpath));
                     }
                     else
                     {
-
-                        PrintError("The collect path is unreachable, please make sure put in a accessible share,quitting the application.....");
-                        WriteLog(configpath, logfile, "The collect path is unreachable,please make sure put in a accessible share,quitting the application.....");
+                        PrintError(string.Format("The collect path:{0} is unreachable,please make sure put in a accessible share,quitting the application.....",collectpath));
+                        //PrintError("The collect path is unreachable, please make sure put in a accessible share,quitting the application.....");
+                        WriteLog(configpath, logfile, string.Format("The collect path:{0} is unreachable,please make sure put in a accessible share,quitting the application.....",collectpath));
                         return;
 
                     }
@@ -99,13 +99,18 @@ namespace PSTMaster
 
                 if (mode != null && jobname != null && location != null && collectpath != null)
                 {
-                    dropfile(fullogpath, out excemessage);
-                    WriteLog(configpath,logfile,excemessage);
+                    //dropfile(fullogpath, out excemessage);
+                    //WriteLog(configpath,logfile,excemessage);
                     switch (mode)
                     {
                         case "find": DoMode.Find(location, collectpath, jobname, computername, configpath, outputfilename); break;
                         case "collect": DoMode.Collect(location, collectpath, jobname, computername, configpath, outputfilename); break;
                         case "remove": DoMode.Remove(location, collectpath, jobname, computername, configpath, outputfilename); break;
+                        default:
+                        PrintError(string.Format("{0} is not a support mode, plesae use Find, Collect, Remove, try /help to see the application useage smaples", mode));
+                        WriteLog(configpath, logfile,string.Format("{0} is not a support mode, plesae use Find, Collect, Remove, try /help to see the application useage samples", mode));
+                        break;
+                            
                     }
                 }
 
@@ -163,7 +168,8 @@ namespace PSTMaster
                 CopyFile(outputfilename, configpath, collectpath, out copyexception);
                 if (copyexception != null)
                 { WriteLog(configpath, logfile, copyexception); }                
-                WriteLog(configpath, logfile, "Find operation completed, please check output in the csv file");
+                WriteLog(configpath, logfile, string.Format("Find operation completed, please check output in {0}{1}",configpath,outputfilename));
+                Console.WriteLine("Find operation - Complete, please check output in {0}{1}", configpath,outputfilename);
             }
             public static void Collect(string locationpath, string collectpath, string jobname, string computername, string configpath, string outputfilename)
             {
@@ -225,15 +231,17 @@ namespace PSTMaster
                         else
                         {
                             text.WriteLine("Search operaton completed but no .pst file being found");
-                            WriteLog(configpath, logfile, string.Format("Search operaton completed but no .pst file being found"));
+                            WriteLog(configpath, logfile,"Search operaton completed but no .pst file being found");
                         }
                     }
                 
                 
 
-                CopyFile(outputfilename, configpath, collectpath,out copyexception);              
-                WriteLog(configpath, logfile, copyexception);
-                WriteLog(configpath, logfile, "Collect operation completed, please check output in the csv file");
+                CopyFile(outputfilename, configpath, collectpath,out copyexception);
+                if (copyexception != null)
+                { WriteLog(configpath, logfile, copyexception); }
+                WriteLog(configpath, logfile, string.Format("Collect operation completed, please check output in {0}{1}",configpath,outputfilename));
+                Console.WriteLine("Collect operation - Complete, please check output in {0}{1}", configpath,outputfilename);
             }
             public static void Remove(string locationpath, string collectpath, string jobname, string computername, string configpath, string outputfilename)
             {
@@ -302,8 +310,8 @@ namespace PSTMaster
                 if (copyexception != null)
                 { WriteLog(configpath, logfile, copyexception); }  
 
-                WriteLog(configpath, logfile, "Remove operation completed, please check output in the csv file");
-
+                WriteLog(configpath, logfile, string.Format("Remove operation completed, please check output in {0}{1}",configpath,outputfilename));
+                Console.WriteLine("Remove operation - Complete, please check output in {0}{1}", configpath,outputfilename);
             }
         }
         static void CopyFile(string fileName, string sourcePath, string targetPath, out string exmessage)
